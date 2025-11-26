@@ -1,30 +1,31 @@
-// import "prismjs/plugins/line-numbers/prism-line-numbers.js";
-// import "prismjs/plugins/line-numbers/prism-line-numbers.css";
-import './code-theme.css'
-import Prism from 'prismjs'
-import 'prismjs/components/prism-javascript'
-import 'prismjs/components/prism-jsx'
-import 'prismjs/components/prism-python'
-import 'prismjs/components/prism-tsx'
-import 'prismjs/components/prism-typescript'
-import { useEffect } from 'react'
+import CodeMirror from '@uiw/react-codemirror'
+import { javascript } from '@codemirror/lang-javascript'
+import { python } from '@codemirror/lang-python'
+import { githubDark } from '@uiw/codemirror-theme-github'
 
 export function CodeView({ code, lang }: { code: string; lang: string }) {
-  useEffect(() => {
-    Prism.highlightAll()
-  }, [code])
+  const extensions = []
+
+  if (lang === 'js' || lang === 'jsx' || lang === 'ts' || lang === 'tsx') {
+    extensions.push(javascript({ jsx: true, typescript: true }))
+  } else if (lang === 'py' || lang === 'python') {
+    extensions.push(python())
+  }
 
   return (
-    <pre
-      className="p-4 pt-2"
-      style={{
-        fontSize: 12,
-        backgroundColor: 'transparent',
-        borderRadius: 0,
-        margin: 0,
+    <CodeMirror
+      value={code}
+      height="100%"
+      theme={githubDark}
+      extensions={extensions}
+      readOnly={true}
+      editable={false}
+      basicSetup={{
+        lineNumbers: true,
+        foldGutter: true,
+        highlightActiveLine: false,
       }}
-    >
-      <code className={`language-${lang}`}>{code}</code>
-    </pre>
+      style={{ fontSize: 12, height: '100%' }}
+    />
   )
 }

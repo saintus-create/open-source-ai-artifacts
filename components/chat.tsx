@@ -2,7 +2,7 @@ import { Message } from '@/lib/messages'
 import { FragmentSchema } from '@/lib/schema'
 import { ExecutionResult } from '@/lib/types'
 import { DeepPartial } from 'ai'
-import { LoaderIcon, Terminal } from 'lucide-react'
+import { LoaderIcon, Terminal, User, Bot } from 'lucide-react'
 import { useEffect } from 'react'
 import Image from 'next/image'
 
@@ -28,60 +28,79 @@ export function Chat({
   return (
     <div
       id="chat-container"
-      className="flex flex-col pb-12 gap-2 overflow-y-auto max-h-full"
+      className="flex flex-col pb-4 gap-4 overflow-y-auto max-h-full"
     >
       {messages.map((message: Message, index: number) => (
         <div
-          className={`flex flex-col px-4 shadow-sm whitespace-pre-wrap ${message.role !== 'user' ? 'bg-accent dark:bg-white/5 border text-accent-foreground dark:text-muted-foreground py-4 rounded-2xl gap-4 w-full' : 'bg-gradient-to-b from-black/5 to-black/10 dark:from-black/30 dark:to-black/50 py-2 rounded-xl gap-2 w-fit'} font-serif`}
+          className={`flex flex-col px-4 py-4 gap-2 w-full ${message.role !== 'user' ? 'bg-muted/30' : ''}`}
           key={index}
         >
-          {message.content.map((content, id) => {
-            if (content.type === 'text') {
-              return content.text
-            }
-            if (content.type === 'image') {
-              return (
-                <Image
-                  key={id}
-                  src={content.image}
-                  alt="fragment"
-                  width={48}
-                  height={48}
-                  unoptimized
-                  className="mr-2 inline-block w-12 h-12 object-cover rounded-lg bg-white mb-2"
-                />
-              )
-            }
-          })}
-          {message.object && (
-            <div
-              onClick={() =>
-                setCurrentPreview({
-                  fragment: message.object,
-                  result: message.result,
-                })
+          <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground mb-1">
+            {message.role === 'user' ? (
+              <>
+                <User className="w-4 h-4" />
+                <span>You</span>
+              </>
+            ) : (
+              <>
+                <Bot className="w-4 h-4 text-primary" />
+                <span className="text-primary">AI</span>
+              </>
+            )}
+          </div>
+
+          <div className="pl-6 text-sm leading-relaxed text-foreground whitespace-pre-wrap font-sans">
+            {message.content.map((content, id) => {
+              if (content.type === 'text') {
+                return <span key={id}>{content.text}</span>
               }
-              className="py-2 pl-2 w-full md:w-max flex items-center border rounded-xl select-none hover:bg-white dark:hover:bg-white/5 hover:cursor-pointer"
-            >
-              <div className="rounded-[0.5rem] w-10 h-10 bg-black/5 dark:bg-white/5 self-stretch flex items-center justify-center">
-                <Terminal strokeWidth={2} className="text-[#FF8800]" />
-              </div>
-              <div className="pl-2 pr-4 flex flex-col">
-                <span className="font-bold font-sans text-sm text-primary">
-                  {message.object.title}
-                </span>
-                <span className="font-sans text-sm text-muted-foreground">
-                  Click to see fragment
-                </span>
+              if (content.type === 'image') {
+                return (
+                  <Image
+                    key={id}
+                    src={content.image}
+                    alt="fragment"
+                    width={48}
+                    height={48}
+                    unoptimized
+                    className="mr-2 inline-block w-12 h-12 object-cover rounded-lg bg-white mb-2"
+                  />
+                )
+              }
+            })}
+          </div>
+
+          {message.object && (
+            <div className="pl-6 mt-2">
+              <div
+                onClick={() =>
+                  setCurrentPreview({
+                    fragment: message.object,
+                    result: message.result,
+                  })
+                }
+                className="py-3 px-4 w-full md:w-max flex items-center border border-border/50 bg-card hover:bg-accent/50 transition-colors rounded-lg cursor-pointer group"
+              >
+                <div className="rounded-md w-8 h-8 bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                  <Terminal strokeWidth={2} className="w-4 h-4 text-primary" />
+                </div>
+                <div className="pl-3 pr-4 flex flex-col">
+                  <span className="font-medium text-sm text-foreground">
+                    {message.object.title}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    Click to view code
+                  </span>
+                </div>
               </div>
             </div>
           )}
         </div>
       ))}
       {isLoading && (
-        <div className="flex items-center gap-1 text-sm text-muted-foreground">
+        <div className="flex items-center gap-2 px-4 py-4 text-sm text-muted-foreground animate-pulse">
           <LoaderIcon strokeWidth={2} className="animate-spin w-4 h-4" />
-          <span>Generating...</span>
+          <span>Thinking...</span>
         </div>
       )}
     </div>

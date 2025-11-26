@@ -1,10 +1,10 @@
 import { Duration } from '@/lib/duration'
 import { getModelClient } from '@/lib/models'
 import { LLMModel, LLMModelConfig } from '@/lib/models'
-import { toPrompt } from '@/lib/prompt'
+import { toGenerationPrompt } from '@/lib/prompt'
 import { fragmentSchema as schema } from '@/lib/schema'
 import { Templates } from '@/lib/templates'
-import { streamObject, LanguageModel, CoreMessage } from 'ai'
+import { streamObject, LanguageModel } from 'ai'
 
 export const maxDuration = 60
 
@@ -24,78 +24,41 @@ export async function POST(req: Request) {
     model,
     config,
   }: {
-    messages: CoreMessage[]
-    userID: string | undefined
-    teamID: string | undefined
-    template: Templates
-    model: LLMModel
-    config: LLMModelConfig
-  } = await req.json()
+    messages: any[];
+    userID: string | undefined;
+    teamID: string | undefined;
+    template: Templates;
+    model: LLMModel;
+    config: LLMModelConfig;
+  } = await req.json();
 
-  const limit = false
-
-  if (limit) {
-    return new Response('You have reached your request limit for the day.', {
-      status: 429,
-    })
-  }
-
-  const { model: modelNameString, apiKey: modelApiKey, ...modelParams } = config
-  const modelClient = getModelClient(model, config)
+  const { model: modelNameString, apiKey: modelApiKey, ...modelParams } = config;
+  console.log('Using model:', model.id, 'Provider:', model.providerId);
+  const modelClient = getModelClient(model, config);
 
   try {
+    console.log('Starting Generation');
     const stream = await streamObject({
       model: modelClient as LanguageModel,
       schema,
-      system: toPrompt(template),
+      system: toGenerationPrompt(template),
       messages,
-      maxRetries: 0, // do not retry on errors
+      maxRetries: 3,
       ...modelParams,
-    })
-
-    return stream.toTextStreamResponse()
+    });
+    console.log('Generation stream created');
+    return stream.toTextStreamResponse();
   } catch (error: any) {
-    const isRateLimitError =
-      error && (error.statusCode === 429 || error.message.includes('limit'))
-    const isOverloadedError =
-      error && (error.statusCode === 529 || error.statusCode === 503)
-    const isAccessDeniedError =
-      error && (error.statusCode === 403 || error.statusCode === 401)
-
-    if (isRateLimitError) {
-      return new Response(
-        'The provider is currently unavailable due to request limit. Try using your own API key.',
-        {
-          status: 429,
-        },
-      )
+    console.error('Generation error:', error);
+    if (error?.statusCode === 429) {
+      return new Response('Rate limit exceeded. Please try again later.', { status: 429 });
     }
-
-    if (isOverloadedError) {
-      return new Response(
-        'The provider is currently unavailable. Please try again later.',
-        {
-          status: 529,
-        },
-      )
+    if (error?.statusCode === 503 || error?.statusCode === 529) {
+      return new Response('Provider overloaded. Please try again later.', { status: error.statusCode });
     }
-
-    if (isAccessDeniedError) {
-      return new Response(
-        'Access denied. Please make sure your API key is valid.',
-        {
-          status: 403,
-        },
-      )
+    if (error?.statusCode === 401 || error?.statusCode === 403) {
+      return new Response('Access denied. Check your API key.', { status: error.statusCode });
     }
-
-    console.error('Error:', error)
-
-    return new Response(
-      'An unexpected error has occurred. Please try again later.',
-      {
-        status: 500,
-      },
-    )
+    return new Response(`Generation failed: ${error?.message ?? 'unknown error'}`, { status: 500 });
   }
 }

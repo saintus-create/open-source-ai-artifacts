@@ -87,7 +87,7 @@ export default function Home() {
       setFragment(object)
       const content: Message['content'] = [
         { type: 'text', text: object.commentary || '' },
-        { type: 'code', text: object.code || '' },
+        { type: 'code', text: object.code?.[0]?.file_content || '' },
       ]
 
       if (!lastMessage || lastMessage.role !== 'assistant') {
@@ -228,8 +228,8 @@ export default function Home() {
         >
           <NavBar
             session={null as any}
-            showLogin={() => {}}
-            signOut={() => {}}
+            showLogin={() => { }}
+            signOut={() => { }}
             onSocialClick={handleSocialClick}
             onClear={handleClearChat}
             canClear={messages.length > 0}

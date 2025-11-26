@@ -302,6 +302,13 @@
       "multiModal": false
     },
     {
+      "id": "llama-3.3-70b-specdec",
+      "provider": "Groq",
+      "providerId": "groq",
+      "name": "Llama 3.3 70B SpecDec",
+      "multiModal": false
+    },
+    {
       "id": "accounts/fireworks/models/qwen3-coder-480b-a35b-instruct",
       "provider": "Fireworks",
       "providerId": "fireworks",

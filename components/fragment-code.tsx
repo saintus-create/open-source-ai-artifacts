@@ -40,9 +40,8 @@ export function FragmentCode({
           {files.map((file) => (
             <div
               key={file.name}
-              className={`flex gap-2 select-none cursor-pointer items-center text-sm text-muted-foreground px-2 py-1 rounded-md hover:bg-muted border ${
-                file.name === currentFile ? 'bg-muted border-muted' : ''
-              }`}
+              className={`flex gap-2 select-none cursor-pointer items-center text-sm text-muted-foreground px-2 py-1 rounded-md hover:bg-muted border ${file.name === currentFile ? 'bg-muted border-muted' : ''
+                }`}
               onClick={() => setCurrentFile(file.name)}
             >
               <FileText className="h-4 w-4" />
@@ -81,7 +80,7 @@ export function FragmentCode({
           </TooltipProvider>
         </div>
       </div>
-      <div className="flex flex-col flex-1 overflow-x-auto">
+      <div className="flex flex-col flex-1 overflow-hidden">
         <CodeView
           code={currentFileContent || ''}
           lang={currentFile.split('.').pop() || ''}

@@ -1,6 +1,5 @@
 'use client'
 
-import { RepoBanner } from './repo-banner'
 import { Button } from '@/components/ui/button'
 import {
   Tooltip,
@@ -151,7 +150,7 @@ export function ChatInput({
     <form
       onSubmit={handleSubmit}
       onKeyDown={onEnter}
-      className="mb-2 mt-auto flex flex-col bg-background"
+      className="mb-4 mt-auto flex flex-col bg-background px-4 pb-4"
       onDragEnter={isMultiModal ? handleDrag : undefined}
       onDragLeave={isMultiModal ? handleDrag : undefined}
       onDragOver={isMultiModal ? handleDrag : undefined}
@@ -159,71 +158,71 @@ export function ChatInput({
     >
       {isErrored && (
         <div
-          className={`flex items-center p-1.5 text-sm font-medium mx-4 mb-10 rounded-xl ${
-            isRateLimited
+          className={`flex items-center p-1.5 text-sm font-medium mx-4 mb-4 rounded-xl ${isRateLimited
               ? 'bg-orange-400/10 text-orange-400'
               : 'bg-red-400/10 text-red-400'
-          }`}
+            }`}
         >
           <span className="flex-1 px-1.5">{errorMessage}</span>
           <button
-            className={`px-2 py-1 rounded-sm ${
-              isRateLimited ? 'bg-orange-400/20' : 'bg-red-400/20'
-            }`}
+            className={`px-2 py-1 rounded-sm ${isRateLimited ? 'bg-orange-400/20' : 'bg-red-400/20'
+              }`}
             onClick={retry}
           >
             Try again
           </button>
         </div>
       )}
-      <div className="relative">
-        <RepoBanner className="absolute bottom-full inset-x-2 translate-y-1 z-0 pb-2" />
+      <div className="relative w-full max-w-[800px] mx-auto">
         <div
-          className={`shadow-md rounded-2xl relative z-10 bg-background border ${
-            dragActive
-              ? 'before:absolute before:inset-0 before:rounded-2xl before:border-2 before:border-dashed before:border-primary'
-              : ''
-          }`}
+          className={`shadow-lg rounded-xl relative z-10 bg-card border border-border/50 transition-all duration-200 ${dragActive
+              ? 'ring-2 ring-primary/20'
+              : 'focus-within:ring-2 focus-within:ring-primary/20'
+            }`}
         >
-          <div className="flex items-center px-3 py-2 gap-1">{children}</div>
+          <div className="flex items-center px-3 py-2 gap-1 border-b border-border/50 bg-muted/20 rounded-t-xl">
+            {children}
+          </div>
+
           <TextareaAutosize
             autoFocus={true}
-            minRows={1}
-            maxRows={5}
-            className="text-normal px-3 resize-none ring-0 bg-inherit w-full m-0 outline-none"
+            minRows={3}
+            maxRows={10}
+            className="text-sm px-4 py-3 resize-none bg-transparent w-full m-0 outline-none text-foreground placeholder:text-muted-foreground/70"
             required={true}
-            placeholder="Describe your app..."
+            placeholder="Ask anything (Cmd+K)..."
             disabled={isErrored}
             value={input}
             onChange={handleInputChange}
             onPaste={isMultiModal ? handlePaste : undefined}
           />
-          <div className="flex p-3 gap-2 items-center">
-            <input
-              type="file"
-              id="multimodal"
-              name="multimodal"
-              accept="image/*"
-              multiple={true}
-              className="hidden"
-              onChange={handleFileInput}
-            />
-            <div className="flex items-center flex-1 gap-2">
+
+          <div className="flex p-2 gap-2 items-center justify-between">
+            <div className="flex items-center gap-2">
+              <input
+                type="file"
+                id="multimodal"
+                name="multimodal"
+                accept="image/*"
+                multiple={true}
+                className="hidden"
+                onChange={handleFileInput}
+              />
               <TooltipProvider>
                 <Tooltip delayDuration={0}>
                   <TooltipTrigger asChild>
                     <Button
                       disabled={!isMultiModal || isErrored}
                       type="button"
-                      variant="outline"
+                      variant="ghost"
                       size="icon"
-                      className="rounded-xl h-10 w-10"
+                      className="rounded-lg h-8 w-8 text-muted-foreground hover:text-foreground"
                       onClick={(e) => {
                         e.preventDefault()
                         document.getElementById('multimodal')?.click()
                       }}
                     >
-                      <Paperclip className="h-5 w-5" />
+                      <Paperclip className="h-4 w-4" />
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>Add attachments</TooltipContent>
@@ -231,6 +230,7 @@ export function ChatInput({
               </TooltipProvider>
               {files.length > 0 && filePreview}
             </div>
+
             <div>
               {!isLoading ? (
                 <TooltipProvider>
@@ -241,9 +241,9 @@ export function ChatInput({
                         variant="default"
                         size="icon"
                         type="submit"
-                        className="rounded-xl h-10 w-10"
+                        className="rounded-lg h-8 w-8 bg-primary text-primary-foreground hover:bg-primary/90"
                       >
-                        <ArrowUp className="h-5 w-5" />
+                        <ArrowUp className="h-4 w-4" />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>Send message</TooltipContent>
@@ -256,13 +256,13 @@ export function ChatInput({
                       <Button
                         variant="secondary"
                         size="icon"
-                        className="rounded-xl h-10 w-10"
+                        className="rounded-lg h-8 w-8"
                         onClick={(e) => {
                           e.preventDefault()
                           stop()
                         }}
                       >
-                        <Square className="h-5 w-5" />
+                        <Square className="h-4 w-4 fill-current" />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>Stop generation</TooltipContent>
@@ -273,11 +273,8 @@ export function ChatInput({
           </div>
         </div>
       </div>
-      <p className="text-xs text-muted-foreground mt-2 text-center">
-        Fragments is an open-source project made by{' '}
-        <a href="https://e2b.dev" target="_blank" className="text-[#ff8800]">
-          ✶ E2B
-        </a>
+      <p className="text-[10px] text-muted-foreground mt-2 text-center opacity-50">
+        AI can make mistakes. Please review generated code.
       </p>
     </form>
   )
