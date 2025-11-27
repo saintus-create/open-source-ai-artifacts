@@ -1,0 +1,21 @@
+#!/usr/bin/env node
+
+const { execSync } = require('child_process');
+const path = require('path');
+
+const filePath = process.argv[2];
+if (!filePath || !filePath.trim()) {
+  process.exit(0);
+}
+
+try {
+  // Run Prettier to format the file. If Prettier makes changes, it will output nothing.
+  execSync(`npx prettier --write "${filePath}"`, {
+    stdio: 'inherit',
+  });
+} catch (error) {
+  console.error(`[Autofixer] Prettier failed for ${path.basename(filePath)}`);
+  process.exit(1);
+}
+
+// No output on success – the loop will treat this as clean.

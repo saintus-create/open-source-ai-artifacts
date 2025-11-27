@@ -14,7 +14,7 @@ import templates, { TemplateId } from '@/lib/templates'
 import { ExecutionResult } from '@/lib/types'
 import { DeepPartial } from 'ai'
 import { experimental_useObject as useObject } from 'ai/react'
-import { SetStateAction, useEffect, useState } from 'react'
+import { SetStateAction, useEffect, useState, useCallback, useRef, useMemo } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
 
 export default function Home() {
@@ -30,12 +30,22 @@ export default function Home() {
     },
   )
 
+  const [isMounted, setIsMounted] = useState(false)
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
   // Core-only mode: no auth
   const session: null = null
   const userTeam: { id?: string } | undefined = undefined
 
   const [result, setResult] = useState<ExecutionResult>()
   const [messages, setMessages] = useState<Message[]>([])
+  const messagesRef = useRef(messages)
+  useEffect(() => {
+    messagesRef.current = messages
+  }, [messages])
+
   const [fragment, setFragment] = useState<DeepPartial<FragmentSchema>>()
   const [currentTab, setCurrentTab] = useState<'code' | 'fragment'>('code')
   const [isPreviewLoading, setIsPreviewLoading] = useState(false)
@@ -52,11 +62,12 @@ export default function Home() {
   const currentModel = filteredModels.find(
     (model) => model.id === languageModel.model,
   )
-  const currentTemplate =
+  const currentTemplate = useMemo(() =>
     selectedTemplate === 'auto'
       ? templates
-      : { [selectedTemplate]: templates[selectedTemplate] }
-  const lastMessage = messages[messages.length - 1]
+      : { [selectedTemplate]: templates[selectedTemplate] },
+    [selectedTemplate]
+  )
 
   const { object, submit, isLoading, stop, error } = useObject({
     api: '/api/chat',
@@ -82,6 +93,23 @@ export default function Home() {
     },
   })
 
+  const addMessage = useCallback((message: Message) => {
+    setMessages((previousMessages) => [...previousMessages, message])
+    return [...messagesRef.current, message]
+  }, [])
+
+  const setMessage = useCallback((message: Partial<Message>, index?: number) => {
+    setMessages((previousMessages) => {
+      const updatedMessages = [...previousMessages]
+      updatedMessages[index ?? previousMessages.length - 1] = {
+        ...previousMessages[index ?? previousMessages.length - 1],
+        ...message,
+      }
+
+      return updatedMessages
+    })
+  }, [])
+
   useEffect(() => {
     if (object) {
       setFragment(object)
@@ -89,6 +117,8 @@ export default function Home() {
         { type: 'text', text: object.commentary || '' },
         { type: 'code', text: object.code?.[0]?.file_content || '' },
       ]
+
+      const lastMessage = messagesRef.current[messagesRef.current.length - 1]
 
       if (!lastMessage || lastMessage.role !== 'assistant') {
         addMessage({
@@ -105,25 +135,13 @@ export default function Home() {
         })
       }
     }
-  }, [object])
+  }, [object, addMessage, setMessage])
 
   useEffect(() => {
     if (error) stop()
-  }, [error])
+  }, [error, stop])
 
-  function setMessage(message: Partial<Message>, index?: number) {
-    setMessages((previousMessages) => {
-      const updatedMessages = [...previousMessages]
-      updatedMessages[index ?? previousMessages.length - 1] = {
-        ...previousMessages[index ?? previousMessages.length - 1],
-        ...message,
-      }
-
-      return updatedMessages
-    })
-  }
-
-  async function handleSubmitAuth(e: React.FormEvent<HTMLFormElement>) {
+  const handleSubmitAuth = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
     if (isLoading) {
@@ -156,9 +174,9 @@ export default function Home() {
     setChatInput('')
     setFiles([])
     setCurrentTab('code')
-  }
+  }, [isLoading, stop, chatInput, files, addMessage, submit, currentTemplate, currentModel, languageModel, setChatInput])
 
-  function retry() {
+  const retry = useCallback(() => {
     submit({
       userID: undefined,
       teamID: undefined,
@@ -167,26 +185,21 @@ export default function Home() {
       model: currentModel,
       config: languageModel,
     })
-  }
+  }, [submit, messages, currentTemplate, currentModel, languageModel])
 
-  function addMessage(message: Message) {
-    setMessages((previousMessages) => [...previousMessages, message])
-    return [...messages, message]
-  }
-
-  function handleSaveInputChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
+  const handleSaveInputChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setChatInput(e.target.value)
-  }
+  }, [setChatInput])
 
-  function handleFileChange(change: SetStateAction<File[]>) {
+  const handleFileChange = useCallback((change: SetStateAction<File[]>) => {
     setFiles(change)
-  }
+  }, [])
 
-  function handleLanguageModelChange(e: LLMModelConfig) {
+  const handleLanguageModelChange = useCallback((e: LLMModelConfig) => {
     setLanguageModel({ ...languageModel, ...e })
-  }
+  }, [languageModel, setLanguageModel])
 
-  function handleSocialClick(target: 'github' | 'x' | 'discord') {
+  const handleSocialClick = useCallback((target: 'github' | 'x' | 'discord') => {
     if (target === 'github') {
       window.open('https://github.com/e2b-dev/fragments', '_blank')
     } else if (target === 'x') {
@@ -194,9 +207,9 @@ export default function Home() {
     } else if (target === 'discord') {
       window.open('https://discord.gg/U7KEcGErtQ', '_blank')
     }
-  }
+  }, [])
 
-  function handleClearChat() {
+  const handleClearChat = useCallback(() => {
     stop()
     setChatInput('')
     setFiles([])
@@ -205,20 +218,22 @@ export default function Home() {
     setResult(undefined)
     setCurrentTab('code')
     setIsPreviewLoading(false)
-  }
+  }, [stop, setChatInput])
 
-  function setCurrentPreview(preview: {
+  const setCurrentPreview = useCallback((preview: {
     fragment: DeepPartial<FragmentSchema> | undefined
     result: ExecutionResult | undefined
-  }) {
+  }) => {
     setFragment(preview.fragment)
     setResult(preview.result)
-  }
+  }, [])
 
-  function handleUndo() {
+  const handleUndo = useCallback(() => {
     setMessages((previousMessages) => [...previousMessages.slice(0, -2)])
     setCurrentPreview({ fragment: undefined, result: undefined })
-  }
+  }, [setCurrentPreview])
+
+  if (!isMounted) return null
 
   return (
     <main className="flex min-h-screen max-h-screen">

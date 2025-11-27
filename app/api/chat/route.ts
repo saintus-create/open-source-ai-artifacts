@@ -3,6 +3,7 @@ import { getModelClient } from '@/lib/models'
 import { LLMModel, LLMModelConfig } from '@/lib/models'
 import { toGenerationPrompt } from '@/lib/prompt'
 import { fragmentSchema as schema } from '@/lib/schema'
+import { astSchema } from '@/lib/ast-schema' // new import for deterministic mode
 import { Templates } from '@/lib/templates'
 import { streamObject, LanguageModel } from 'ai'
 
@@ -23,6 +24,7 @@ export async function POST(req: Request) {
     template,
     model,
     config,
+    mode = 'text', // "text" or "ast"
   }: {
     messages: any[];
     userID: string | undefined;
@@ -30,35 +32,36 @@ export async function POST(req: Request) {
     template: Templates;
     model: LLMModel;
     config: LLMModelConfig;
-  } = await req.json();
+    mode?: 'text' | 'ast';
+  } = await req.json()
 
-  const { model: modelNameString, apiKey: modelApiKey, ...modelParams } = config;
-  console.log('Using model:', model.id, 'Provider:', model.providerId);
-  const modelClient = getModelClient(model, config);
+  const { model: modelNameString, apiKey: modelApiKey, ...modelParams } = config
+  console.log('Using model:', model.id, 'Provider:', model.providerId, 'Mode:', mode)
+  const modelClient = getModelClient(model, config)
 
   try {
-    console.log('Starting Generation');
+    console.log('Starting Generation')
     const stream = await streamObject({
       model: modelClient as LanguageModel,
-      schema,
+      schema: mode === 'ast' ? astSchema : schema,
       system: toGenerationPrompt(template),
       messages,
       maxRetries: 3,
       ...modelParams,
-    });
-    console.log('Generation stream created');
-    return stream.toTextStreamResponse();
+    })
+    console.log('Generation stream created')
+    return stream.toTextStreamResponse()
   } catch (error: any) {
-    console.error('Generation error:', error);
+    console.error('Generation error:', error)
     if (error?.statusCode === 429) {
-      return new Response('Rate limit exceeded. Please try again later.', { status: 429 });
+      return new Response('Rate limit exceeded. Please try again later.', { status: 429 })
     }
     if (error?.statusCode === 503 || error?.statusCode === 529) {
-      return new Response('Provider overloaded. Please try again later.', { status: error.statusCode });
+      return new Response('Provider overloaded. Please try again later.', { status: error.statusCode })
     }
     if (error?.statusCode === 401 || error?.statusCode === 403) {
-      return new Response('Access denied. Check your API key.', { status: error.statusCode });
+      return new Response('Access denied. Check your API key.', { status: error.statusCode })
     }
-    return new Response(`Generation failed: ${error?.message ?? 'unknown error'}`, { status: 500 });
+    return new Response(`Generation failed: ${error?.message ?? 'unknown error'}`, { status: 500 })
   }
 }

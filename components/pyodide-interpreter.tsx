@@ -6,16 +6,8 @@ import type { FragmentSchema } from '@/lib/schema'
 
 // Lightweight in-browser Python via Pyodide CDN
 // This avoids any server/proprietary runtime
-export function PyodideInterpreter({
-  fragment,
-}: {
-  fragment: DeepPartial<FragmentSchema>
-}) {
-  const iframeRef = useRef<HTMLIFrameElement | null>(null)
-  const [ready, setReady] = useState(false)
-
-  // Minimal HTML that loads pyodide and runs the provided code
-  const html = `<!doctype html>
+// Minimal HTML that loads pyodide and runs the provided code
+const html = `<!doctype html>
 <html>
   <head>
     <meta charset="utf-8" />
@@ -59,13 +51,23 @@ export function PyodideInterpreter({
   </body>
 </html>`
 
+export function PyodideInterpreter({
+  fragment,
+}: {
+  fragment: DeepPartial<FragmentSchema>
+}) {
+  const iframeRef = useRef<HTMLIFrameElement | null>(null)
+  const [ready, setReady] = useState(false)
+
   useEffect(() => {
     // Blob URL for isolated iframe document
     const blob = new Blob([html], { type: 'text/html' })
     const url = URL.createObjectURL(blob)
     const iframe = iframeRef.current
     if (!iframe) return
-    iframe.src = url + '#' + btoa(fragment.code || '')
+
+    const codeContent = fragment.code?.[0]?.file_content || ''
+    iframe.src = url + '#' + btoa(codeContent)
     setReady(true)
     return () => URL.revokeObjectURL(url)
   }, [fragment.code])

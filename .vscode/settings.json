@@ -1,0 +1,12 @@
+{
+    "emeraldwalk.runonsave": {
+        "autoClearConsole": true,
+        "commands": [
+            {
+                "match": "\\.(ts|tsx|js|jsx|vue)$",
+                "isAsync": true,
+                "cmd": "node ./scripts/autofix-loop.js \"${file}\""
+            }
+        ]
+    }
+}
