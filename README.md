@@ -9,6 +9,12 @@ Powered by the [E2B SDK](https://github.com/e2b-dev/code-interpreter).
 
 [→ Try on fragments.e2b.dev](https://fragments.e2b.dev)
 
+## Deploy to Vercel
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/saintus-create/open-source-ai-artifacts)
+
+📖 **[Read the full deployment guide →](DEPLOYMENT.md)**
+
 ## Features
 
 - Based on Next.js 14 (App Router, Server Actions), shadcn/ui, TailwindCSS, Vercel AI SDK.
