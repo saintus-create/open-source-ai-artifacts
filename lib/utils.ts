@@ -13,3 +13,6 @@ export function isFileInArray(file: File, existingFiles: File[]) {
       existing.type === file.type
   )
 }
+
+// Export performance utilities
+export { debounce, throttle, memoize } from './performance'

@@ -8,6 +8,13 @@ const config = {
     './app/**/*.{ts,tsx}',
     './src/**/*.{ts,tsx}',
   ],
+  // Safelist dynamic classes that might be purged
+  safelist: [
+    'animate-float',
+    'animate-pulse-glow',
+    'text-gradient',
+    'glass-panel',
+  ],
   prefix: '',
   theme: {
     container: {
@@ -90,6 +97,10 @@ const config = {
     },
   },
   plugins: [require('tailwindcss-animate')],
+  // Performance optimizations
+  future: {
+    hoverOnlyWhenSupported: true, // Only apply hover styles on devices that support it
+  },
 } satisfies Config
 
 export default config

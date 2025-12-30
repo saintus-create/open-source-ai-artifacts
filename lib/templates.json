@@ -11,14 +11,16 @@
     "lib": ["nextjs@14.2.5", "typescript", "@types/node", "@types/react", "@types/react-dom", "postcss", "tailwindcss", "shadcn"],
     "file": "pages/index.tsx",
     "instructions": "A Next.js 13+ app that reloads automatically. Using the pages router.",
-    "port": 3000
+    "port": 3000,
+    "integrity": "640d09d3aecda55a79db6d405e349fb3d7aa4a5a39f9c072347ff646763b1d21"
   },
   "vue-developer": {
     "name": "Vue.js developer",
     "lib": ["vue@latest", "nuxt@3.13.0", "tailwindcss"],
     "file": "app.vue",
     "instructions": "A Vue.js 3+ app that reloads automatically. Only when asked specifically for a Vue app.",
-    "port": 3000
+    "port": 3000,
+    "integrity": "7dde6b75fa1c001f97f492714465e9241c5f7d67a9b77578a38d8c0b0e5e08ac"
   },
   "streamlit-developer": {
     "name": "Streamlit developer",
@@ -33,7 +35,8 @@
     ],
     "file": "app.py",
     "instructions": "A streamlit app that reloads automatically.",
-    "port": 8501
+    "port": 8501,
+    "integrity": "ee26f597d8ac16befbf216c643b5530e3966a2844ace05c500f3e5b0ef52ad5c"
   },
   "gradio-developer": {
     "name": "Gradio developer",
@@ -48,6 +51,7 @@
     ],
     "file": "app.py",
     "instructions": "A gradio app. Gradio Blocks/Interface should be called demo.",
-    "port": 7860
+    "port": 7860,
+    "integrity": "0e19559dbedce05799b9761d760fa1dbd4b18927d2f1e247eb66d294cc989be2"
   }
 }
