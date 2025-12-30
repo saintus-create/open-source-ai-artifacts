@@ -1,6 +1,7 @@
 import './globals.css'
 import { ThemeProvider } from './providers'
 import { Toaster } from '@/components/ui/toaster'
+import { ScreenReaderAnnouncer } from '@/components/screen-reader-announcer'
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 
@@ -48,6 +49,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
+          <ScreenReaderAnnouncer />
         </ThemeProvider>
         <Toaster />
       </body>

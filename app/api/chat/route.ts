@@ -43,7 +43,7 @@ export async function POST(req: Request) {
     console.log('Starting Generation')
     const stream = await streamObject({
       model: modelClient as LanguageModel,
-      schema: mode === 'ast' ? astSchema : schema,
+      schema: (mode === 'ast' ? astSchema : schema) as any,
       system: toGenerationPrompt(template),
       messages,
       maxRetries: 3,

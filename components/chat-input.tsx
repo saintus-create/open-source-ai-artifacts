@@ -129,14 +129,14 @@ export function ChatInput({
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.8 }}
-          className="relative group"
+          className="group relative"
           key={file.name}
         >
           <span
             onClick={() => handleFileRemove(file)}
-            className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer shadow-sm z-10"
+            className="-top-2 -right-2 z-10 absolute bg-destructive opacity-0 group-hover:opacity-100 shadow-sm p-0.5 rounded-full text-destructive-foreground transition-opacity cursor-pointer"
           >
-            <X className="h-3 w-3" />
+            <X className="w-3 h-3" />
           </span>
           <Image
             src={URL.createObjectURL(file)}
@@ -144,7 +144,7 @@ export function ChatInput({
             width={48}
             height={48}
             unoptimized
-            className="rounded-lg w-12 h-12 object-cover border border-border/50 shadow-sm"
+            className="shadow-sm border border-border/50 rounded-lg w-12 h-12 object-cover"
           />
         </motion.div>
       )
@@ -172,7 +172,7 @@ export function ChatInput({
     <form
       onSubmit={handleSubmit}
       onKeyDown={onEnter}
-      className="mb-4 mt-auto flex flex-col bg-background px-4 pb-4"
+      className="flex flex-col bg-background mt-auto mb-4 px-4 pb-4"
       onDragEnter={isMultiModal ? handleDrag : undefined}
       onDragLeave={isMultiModal ? handleDrag : undefined}
       onDragOver={isMultiModal ? handleDrag : undefined}
@@ -202,20 +202,20 @@ export function ChatInput({
       </AnimatePresence>
 
       {/* Deterministic mode toggle */}
-      <div className="flex items-center justify-end mb-2">
-        <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer">
+      <div className="flex justify-end items-center mb-2">
+        <label className="flex items-center gap-2 text-muted-foreground text-sm cursor-pointer">
           <input
             type="checkbox"
             checked={deterministic}
             onChange={toggleDeterministic}
-            className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+            className="border-gray-300 rounded focus:ring-primary w-4 h-4 text-primary"
           />
-          <Sparkles className="h-4 w-4 text-primary" />
+          <Sparkles className="w-4 h-4 text-primary" />
           Deterministic mode
         </label>
       </div>
 
-      <div className="relative w-full max-w-[800px] mx-auto">
+      <div className="relative mx-auto w-full max-w-[800px]">
         <motion.div
           animate={{
             boxShadow: isFocused || dragActive
@@ -226,7 +226,7 @@ export function ChatInput({
           transition={{ duration: 0.2 }}
           className={`rounded-2xl relative z-10 bg-card/80 backdrop-blur-xl border overflow-hidden`}
         >
-          <div className="flex items-center px-4 py-2 gap-2 border-b border-border/40 bg-muted/30">
+          <div className="flex items-center gap-2 bg-muted/30 px-4 py-2 border-border/40 border-b">
             {children}
           </div>
 
@@ -235,7 +235,7 @@ export function ChatInput({
               autoFocus={true}
               minRows={3}
               maxRows={10}
-              className="text-sm px-4 py-4 resize-none bg-transparent w-full m-0 outline-none text-foreground placeholder:text-muted-foreground/50 font-sans leading-relaxed"
+              className="bg-transparent m-0 px-4 py-4 outline-none w-full font-sans text-foreground placeholder:text-muted-foreground/50 text-sm leading-relaxed resize-none"
               required={true}
               placeholder="Ask Antigravity..."
               disabled={isErrored}
@@ -247,11 +247,11 @@ export function ChatInput({
             />
 
             {/* Subtle corner accent */}
-            <div className="absolute top-0 right-0 w-8 h-8 bg-gradient-to-bl from-primary/5 to-transparent pointer-events-none" />
+            <div className="top-0 right-0 absolute bg-gradient-to-bl from-primary/5 to-transparent w-8 h-8 pointer-events-none" />
           </div>
 
-          <div className="flex px-3 py-2 gap-2 items-center justify-between bg-gradient-to-b from-transparent to-muted/10">
-            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
+          <div className="flex justify-between items-center gap-2 bg-gradient-to-b from-transparent to-muted/10 px-3 py-2">
+            <div className="flex items-center gap-2 py-1 overflow-x-auto no-scrollbar">
               <input
                 type="file"
                 id="multimodal"
@@ -269,13 +269,14 @@ export function ChatInput({
                       type="button"
                       variant="ghost"
                       size="icon"
-                      className="rounded-lg h-9 w-9 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"
+                      className="hover:bg-muted/50 rounded-lg w-9 h-9 text-muted-foreground hover:text-foreground transition-all duration-200"
                       onClick={(e) => {
                         e.preventDefault()
                         document.getElementById('multimodal')?.click()
                       }}
+                      aria-label="Attach files"
                     >
-                      <Paperclip className="h-4 w-4" />
+                      <Paperclip className="w-4 h-4" aria-hidden="true" />
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>Add attachments</TooltipContent>
@@ -296,9 +297,10 @@ export function ChatInput({
                         variant="default"
                         size="icon"
                         type="submit"
-                        className="rounded-lg h-9 w-9 bg-primary text-primary-foreground shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:scale-105 transition-all duration-200"
+                        className="bg-primary shadow-lg shadow-primary/25 hover:shadow-primary/40 rounded-lg w-9 h-9 text-primary-foreground hover:scale-105 transition-all duration-200"
+                        aria-label="Send message"
                       >
-                        <ArrowUp className="h-5 w-5" />
+                        <ArrowUp className="w-5 h-5" aria-hidden="true" />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>Send message</TooltipContent>
@@ -311,13 +313,14 @@ export function ChatInput({
                       <Button
                         variant="secondary"
                         size="icon"
-                        className="rounded-lg h-9 w-9 bg-muted text-muted-foreground animate-pulse"
+                        className="bg-muted rounded-lg w-9 h-9 text-muted-foreground animate-pulse"
                         onClick={(e) => {
                           e.preventDefault()
                           stop()
                         }}
+                        aria-label="Stop generation"
                       >
-                        <Square className="h-4 w-4 fill-current" />
+                        <Square className="fill-current w-4 h-4" aria-hidden="true" />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>Stop generation</TooltipContent>
@@ -328,7 +331,7 @@ export function ChatInput({
           </div>
         </motion.div>
       </div>
-      <p className="text-[10px] text-muted-foreground/60 mt-3 text-center font-medium tracking-wide uppercase">
+      <p className="mt-3 font-medium text-[10px] text-muted-foreground/60 text-center uppercase tracking-wide">
         Antigravity can make mistakes. Check generated code.
       </p>
     </form>

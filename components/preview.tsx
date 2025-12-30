@@ -94,25 +94,26 @@ export function Preview({
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 20 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
-      className="absolute md:relative z-10 top-0 left-0 shadow-2xl md:rounded-tl-3xl md:rounded-bl-3xl md:border-l md:border-y bg-background/95 backdrop-blur-sm h-full w-full overflow-hidden border-border/50"
+      className="top-0 left-0 z-10 absolute md:relative bg-background/95 shadow-2xl backdrop-blur-sm border-border/50 md:border-y md:border-l md:rounded-tl-3xl md:rounded-bl-3xl w-full h-full overflow-hidden"
     >
       <Tabs
         value={selectedTab}
         onValueChange={(value) =>
           onSelectedTabChange(value as 'code' | 'fragment')
         }
-        className="h-full flex flex-col items-start justify-start"
+        className="flex flex-col justify-start items-start h-full"
       >
-        <div className="w-full p-2 flex items-center justify-between border-b border-border/40 bg-muted/20">
+        <div className="flex justify-between items-center bg-muted/20 p-2 border-border/40 border-b w-full">
           <div className="flex items-center gap-2">
             <TooltipProvider>
               <Tooltip delayDuration={0}>
                 <TooltipTrigger asChild>
                   <button
-                    className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-all duration-200"
+                    className="hover:bg-muted p-2 rounded-lg text-muted-foreground hover:text-foreground transition-all duration-200"
                     onClick={onClose}
+                    aria-label="Close sidebar"
                   >
-                    <ChevronsRight className="h-5 w-5" />
+                    <ChevronsRight className="w-5 h-5" aria-hidden="true" />
                   </button>
                 </TooltipTrigger>
                 <TooltipContent>Close sidebar</TooltipContent>
@@ -120,28 +121,28 @@ export function Preview({
             </TooltipProvider>
           </div>
 
-          <div className="flex justify-center bg-muted/50 p-1 rounded-lg border border-border/50">
-            <TabsList className="p-0 bg-transparent h-auto gap-1">
+          <div className="flex justify-center bg-muted/50 p-1 border border-border/50 rounded-lg">
+            <TabsList className="gap-1 bg-transparent p-0 h-auto">
               <TabsTrigger
-                className="data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm text-muted-foreground hover:text-foreground transition-all duration-200 font-medium text-xs py-1.5 px-3 rounded-md gap-2 flex items-center"
+                className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm px-3 py-1.5 rounded-md font-medium text-muted-foreground data-[state=active]:text-foreground hover:text-foreground text-xs transition-all duration-200"
                 value="code"
               >
                 {isChatLoading ? (
                   <LoaderCircle
                     strokeWidth={3}
-                    className="h-3.5 w-3.5 animate-spin text-primary"
+                    className="w-3.5 h-3.5 text-primary animate-spin"
                   />
                 ) : (
-                  <Code2 className="h-3.5 w-3.5" />
+                  <Code2 className="w-3.5 h-3.5" />
                 )}
                 Code
               </TabsTrigger>
               <TabsTrigger
                 disabled={!fragment.code || fragment.code.length === 0}
-                className="data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm text-muted-foreground hover:text-foreground transition-all duration-200 font-medium text-xs py-1.5 px-3 rounded-md gap-2 flex items-center"
+                className="flex items-center gap-2 data-[state=active]:bg-background data-[state=active]:shadow-sm px-3 py-1.5 rounded-md font-medium text-muted-foreground data-[state=active]:text-foreground hover:text-foreground text-xs transition-all duration-200"
                 value="fragment"
               >
-                <Play className="h-3.5 w-3.5" />
+                <Play className="w-3.5 h-3.5" />
                 Preview
               </TabsTrigger>
             </TabsList>
@@ -151,11 +152,12 @@ export function Preview({
             <Tooltip delayDuration={0}>
               <TooltipTrigger asChild>
                 <button
-                  className="p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg transition-all duration-200"
+                  className="hover:bg-primary/10 p-2 rounded-lg text-muted-foreground hover:text-primary transition-all duration-200"
                   onClick={handleDownload}
                   disabled={!fragment.code || fragment.code.length === 0}
+                  aria-label="Download project as ZIP"
                 >
-                  <Download className="h-5 w-5" />
+                  <Download className="w-5 h-5" aria-hidden="true" />
                 </button>
               </TooltipTrigger>
               <TooltipContent>Download as ZIP</TooltipContent>
@@ -164,27 +166,27 @@ export function Preview({
         </div>
 
         {fragment && (
-          <div className="relative overflow-hidden w-full h-full bg-card/50">
+          <div className="relative bg-card/50 w-full h-full overflow-hidden">
             <AnimatePresence mode="wait">
               {isPreviewLoading && (
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="absolute inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm"
+                  className="z-50 absolute inset-0 flex justify-center items-center bg-background/80 backdrop-blur-sm"
                 >
                   <div className="flex flex-col items-center gap-3">
                     <div className="relative w-12 h-12">
-                      <div className="absolute inset-0 rounded-full border-4 border-primary/20" />
-                      <div className="absolute inset-0 rounded-full border-4 border-t-primary animate-spin" />
+                      <div className="absolute inset-0 border-4 border-primary/20 rounded-full" />
+                      <div className="absolute inset-0 border-4 border-t-primary rounded-full animate-spin" />
                     </div>
-                    <span className="text-sm font-medium text-muted-foreground animate-pulse">Building preview...</span>
+                    <span className="font-medium text-muted-foreground text-sm animate-pulse">Building preview...</span>
                   </div>
                 </motion.div>
               )}
             </AnimatePresence>
 
-            <TabsContent value="code" className="h-full m-0">
+            <TabsContent value="code" className="m-0 h-full">
               {fragment.code && fragment.code.length > 0 && (
                 <PanelGroup direction="horizontal" className="h-full">
                   {hasMultipleFiles && (
@@ -193,12 +195,12 @@ export function Preview({
                         defaultSize={25}
                         minSize={15}
                         maxSize={40}
-                        className="bg-muted/10 border-r border-border/40"
+                        className="bg-muted/10 border-border/40 border-r"
                       >
-                        <div className="h-full flex flex-col">
-                          <div className="px-4 py-3 border-b border-border/40 bg-muted/20 flex items-center gap-2">
+                        <div className="flex flex-col h-full">
+                          <div className="flex items-center gap-2 bg-muted/20 px-4 py-3 border-border/40 border-b">
                             <Layers className="w-3.5 h-3.5 text-muted-foreground" />
-                            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                            <h3 className="font-semibold text-muted-foreground text-xs uppercase tracking-wider">
                               Files
                             </h3>
                           </div>
@@ -210,7 +212,7 @@ export function Preview({
                           />
                         </div>
                       </Panel>
-                      <PanelResizeHandle className="w-1 bg-transparent hover:bg-primary/20 transition-colors" />
+                      <PanelResizeHandle className="bg-transparent hover:bg-primary/20 w-1 transition-colors" />
                     </>
                   )}
                   <Panel defaultSize={hasMultipleFiles ? 75 : 100}>
@@ -226,7 +228,7 @@ export function Preview({
                 </PanelGroup>
               )}
             </TabsContent>
-            <TabsContent value="fragment" className="h-full m-0">
+            <TabsContent value="fragment" className="m-0 h-full">
               {fragment.code && fragment.code.length > 0 && (
                 <SandpackPreview
                   files={fragment.code.reduce(

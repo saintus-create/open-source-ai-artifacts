@@ -33,8 +33,8 @@ export function ChatSettings({
         <Tooltip delayDuration={0}>
           <TooltipTrigger asChild>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="text-muted-foreground h-6 w-6 rounded-sm">
-                <Settings2 className="h-4 w-4" />
+              <Button variant="ghost" size="icon" className="rounded-sm w-6 h-6 text-muted-foreground" aria-label="Settings">
+                <Settings2 className="w-4 h-4" aria-hidden="true" />
               </Button>
             </DropdownMenuTrigger>
           </TooltipTrigger>
@@ -87,9 +87,9 @@ export function ChatSettings({
           </>
         )}
         <div className="flex flex-col gap-1.5 px-2 py-2">
-          <span className="text-sm font-medium">Parameters</span>
-          <div className="flex space-x-4 items-center">
-            <span className="text-sm flex-1 text-muted-foreground">
+          <span className="font-medium text-sm">Parameters</span>
+          <div className="flex items-center space-x-4">
+            <span className="flex-1 text-muted-foreground text-sm">
               Output tokens
             </span>
             <Input
@@ -98,7 +98,7 @@ export function ChatSettings({
               min={50}
               max={10000}
               step={1}
-              className="h-6 rounded-sm w-[84px] text-xs text-center tabular-nums"
+              className="rounded-sm w-[84px] h-6 tabular-nums text-xs text-center"
               placeholder="Auto"
               onChange={(e) =>
                 onLanguageModelChange({
@@ -107,8 +107,8 @@ export function ChatSettings({
               }
             />
           </div>
-          <div className="flex space-x-4 items-center">
-            <span className="text-sm flex-1 text-muted-foreground">
+          <div className="flex items-center space-x-4">
+            <span className="flex-1 text-muted-foreground text-sm">
               Temperature
             </span>
             <Input
@@ -117,7 +117,7 @@ export function ChatSettings({
               min={0}
               max={5}
               step={0.01}
-              className="h-6 rounded-sm w-[84px] text-xs text-center tabular-nums"
+              className="rounded-sm w-[84px] h-6 tabular-nums text-xs text-center"
               placeholder="Auto"
               onChange={(e) =>
                 onLanguageModelChange({
@@ -126,15 +126,15 @@ export function ChatSettings({
               }
             />
           </div>
-          <div className="flex space-x-4 items-center">
-            <span className="text-sm flex-1 text-muted-foreground">Top P</span>
+          <div className="flex items-center space-x-4">
+            <span className="flex-1 text-muted-foreground text-sm">Top P</span>
             <Input
               type="number"
               defaultValue={languageModel.topP}
               min={0}
               max={1}
               step={0.01}
-              className="h-6 rounded-sm w-[84px] text-xs text-center tabular-nums"
+              className="rounded-sm w-[84px] h-6 tabular-nums text-xs text-center"
               placeholder="Auto"
               onChange={(e) =>
                 onLanguageModelChange({
@@ -143,15 +143,15 @@ export function ChatSettings({
               }
             />
           </div>
-          <div className="flex space-x-4 items-center">
-            <span className="text-sm flex-1 text-muted-foreground">Top K</span>
+          <div className="flex items-center space-x-4">
+            <span className="flex-1 text-muted-foreground text-sm">Top K</span>
             <Input
               type="number"
               defaultValue={languageModel.topK}
               min={0}
               max={500}
               step={1}
-              className="h-6 rounded-sm w-[84px] text-xs text-center tabular-nums"
+              className="rounded-sm w-[84px] h-6 tabular-nums text-xs text-center"
               placeholder="Auto"
               onChange={(e) =>
                 onLanguageModelChange({
@@ -160,8 +160,8 @@ export function ChatSettings({
               }
             />
           </div>
-          <div className="flex space-x-4 items-center">
-            <span className="text-sm flex-1 text-muted-foreground">
+          <div className="flex items-center space-x-4">
+            <span className="flex-1 text-muted-foreground text-sm">
               Frequence penalty
             </span>
             <Input
@@ -170,7 +170,7 @@ export function ChatSettings({
               min={0}
               max={2}
               step={0.01}
-              className="h-6 rounded-sm w-[84px] text-xs text-center tabular-nums"
+              className="rounded-sm w-[84px] h-6 tabular-nums text-xs text-center"
               placeholder="Auto"
               onChange={(e) =>
                 onLanguageModelChange({
@@ -179,8 +179,8 @@ export function ChatSettings({
               }
             />
           </div>
-          <div className="flex space-x-4 items-center">
-            <span className="text-sm flex-1 text-muted-foreground">
+          <div className="flex items-center space-x-4">
+            <span className="flex-1 text-muted-foreground text-sm">
               Presence penalty
             </span>
             <Input
@@ -189,7 +189,7 @@ export function ChatSettings({
               min={0}
               max={2}
               step={0.01}
-              className="h-6 rounded-sm w-[84px] text-xs text-center tabular-nums"
+              className="rounded-sm w-[84px] h-6 tabular-nums text-xs text-center"
               placeholder="Auto"
               onChange={(e) =>
                 onLanguageModelChange({

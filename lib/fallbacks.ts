@@ -81,16 +81,31 @@ export class FallbackManager {
   createDegradedFragment(error: Error, originalFragment: FragmentSchema): FragmentSchema {
     return {
       ...originalFragment,
-      code: `// Code generation failed due to: ${error.message}\n// Please try again or check your API keys and network connection.\n\n// Fallback: Basic HTML structure\n<!DOCTYPE html>\n<html>\n<head>\n  <title>Generated Project</title>\n</head>\n<body>\n  <h1>Project Generation Failed</h1>\n  <p>Please try again or contact support.</p>\n</body>\n</html>`,
-      preview: {
-        ...originalFragment.preview,
-        url: null,
-        error: 'Sandbox execution failed',
-        status: 'error'
-      },
+      code: [
+        {
+          file_path: 'index.html',
+          file_content: `<!DOCTYPE html>
+<html>
+<head>
+  <title>Project Generation Failed</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 40px; text-align: center; }
+    .error { color: #d32f2f; }
+    .message { margin: 20px 0; }
+  </style>
+</head>
+<body>
+  <h1 class="error">Project Generation Failed</h1>
+  <p class="message">Error: ${error.message}</p>
+  <p>Please try again or check your API keys and network connection.</p>
+</body>
+</html>`
+        }
+      ],
+      // @ts-ignore - Adding status/error fields for UI handling
       status: 'error',
       error: error.message
-    }
+    } as any
   }
 
   // Get fallback sandbox configuration

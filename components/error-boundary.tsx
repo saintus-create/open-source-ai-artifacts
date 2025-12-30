@@ -60,9 +60,13 @@ export class ErrorBoundary extends Component<Props, State> {
               <AlertCircle className="w-4 h-4" />
               <AlertTitle>Something went wrong</AlertTitle>
               <AlertDescription>
-                We're sorry, but something unexpected happened. Please try again.
+                We&apos;re sorry, but something unexpected happened. Please try again.
               </AlertDescription>
             </Alert>
+            
+            <p className="mb-4 text-muted-foreground">
+              It&apos;s not you, it&apos;s us. We encountered an unexpected error.
+            </p>
             
             <div className="space-y-4">
               <Button 

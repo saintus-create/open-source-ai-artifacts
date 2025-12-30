@@ -105,60 +105,154 @@ export class SandboxErrorHandler {
   private createTimeoutFragment(fragment: FragmentSchema, error: SandboxError): FragmentSchema {
     return {
       ...fragment,
-      code: `${fragment.code}\n\n// ERROR: Code execution timed out after sandbox limit\n// This usually happens when:\n// - Code has infinite loops\n// - Code performs heavy computations\n// - Dependencies take too long to install\n\n// SOLUTION: Try simplifying your code or breaking it into smaller parts.`,
-      preview: {
-        ...fragment.preview,
-        error: 'Execution timeout',
-        status: 'timeout'
-      },
+      code: [
+        {
+          file_path: 'error.html',
+          file_content: `<!DOCTYPE html>
+<html>
+<head>
+  <title>Execution Timeout</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 40px; text-align: center; }
+    .error { color: #f57c00; }
+    .message { margin: 20px 0; }
+    .solution { background: #fff3e0; padding: 20px; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <h1 class="error">Execution Timeout</h1>
+  <p class="message">Code execution timed out after sandbox limit</p>
+  <div class="solution">
+    <h3>This usually happens when:</h3>
+    <ul style="text-align: left; display: inline-block;">
+      <li>Code has infinite loops</li>
+      <li>Code performs heavy computations</li>
+      <li>Dependencies take too long to install</li>
+    </ul>
+    <p><strong>SOLUTION:</strong> Try simplifying your code or breaking it into smaller parts.</p>
+  </div>
+</body>
+</html>`
+        }
+      ],
+      // @ts-ignore
       status: 'timeout',
       error: error.message
-    }
+    } as any
   }
 
   // Create memory-specific error fragment
   private createMemoryFragment(fragment: FragmentSchema, error: SandboxError): FragmentSchema {
     return {
       ...fragment,
-      code: `${fragment.code}\n\n// ERROR: Code exceeded memory limit\n// This usually happens when:\n// - Code processes large datasets\n// - Code has memory leaks\n// - Too many dependencies are installed\n\n// SOLUTION: Try reducing data size or optimizing memory usage.`,
-      preview: {
-        ...fragment.preview,
-        error: 'Memory limit exceeded',
-        status: 'memory_error'
-      },
+      code: [
+        {
+          file_path: 'error.html',
+          file_content: `<!DOCTYPE html>
+<html>
+<head>
+  <title>Memory Limit Exceeded</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 40px; text-align: center; }
+    .error { color: #d32f2f; }
+    .message { margin: 20px 0; }
+    .solution { background: #ffebee; padding: 20px; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <h1 class="error">Memory Limit Exceeded</h1>
+  <p class="message">Code exceeded memory limit</p>
+  <div class="solution">
+    <h3>This usually happens when:</h3>
+    <ul style="text-align: left; display: inline-block;">
+      <li>Code processes large datasets</li>
+      <li>Code has memory leaks</li>
+      <li>Too many dependencies are installed</li>
+    </ul>
+    <p><strong>SOLUTION:</strong> Try reducing data size or optimizing memory usage.</p>
+  </div>
+</body>
+</html>`
+        }
+      ],
+      // @ts-ignore
       status: 'memory_error',
       error: error.message
-    }
+    } as any
   }
 
   // Create network-specific error fragment
   private createNetworkFragment(fragment: FragmentSchema, error: SandboxError): FragmentSchema {
     return {
       ...fragment,
-      code: `${fragment.code}\n\n// ERROR: Network access failed\n// This usually happens when:\n// - External API calls are blocked\n// - Network connectivity issues\n// - Firewall restrictions\n\n// SOLUTION: Check network settings or use offline alternatives.`,
-      preview: {
-        ...fragment.preview,
-        error: 'Network error',
-        status: 'network_error'
-      },
+      code: [
+        {
+          file_path: 'error.html',
+          file_content: `<!DOCTYPE html>
+<html>
+<head>
+  <title>Network Error</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 40px; text-align: center; }
+    .error { color: #1976d2; }
+    .message { margin: 20px 0; }
+    .solution { background: #e3f2fd; padding: 20px; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <h1 class="error">Network Error</h1>
+  <p class="message">Network access failed</p>
+  <div class="solution">
+    <h3>This usually happens when:</h3>
+    <ul style="text-align: left; display: inline-block;">
+      <li>External API calls are blocked</li>
+      <li>Network connectivity issues</li>
+      <li>Firewall restrictions</li>
+    </ul>
+    <p><strong>SOLUTION:</strong> Check network settings or use offline alternatives.</p>
+  </div>
+</body>
+</html>`
+        }
+      ],
+      // @ts-ignore
       status: 'network_error',
       error: error.message
-    }
+    } as any
   }
 
   // Create generic error fragment
   private createGenericErrorFragment(fragment: FragmentSchema, error: SandboxError): FragmentSchema {
     return {
       ...fragment,
-      code: `${fragment.code}\n\n// ERROR: Code execution failed\n// Error: ${error.message}\n\n// SOLUTION: Check the error details and try again.`,
-      preview: {
-        ...fragment.preview,
-        error: 'Execution failed',
-        status: 'error'
-      },
+      code: [
+        {
+          file_path: 'error.html',
+          file_content: `<!DOCTYPE html>
+<html>
+<head>
+  <title>Execution Failed</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 40px; text-align: center; }
+    .error { color: #d32f2f; }
+    .message { margin: 20px 0; }
+    .solution { background: #ffebee; padding: 20px; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <h1 class="error">Execution Failed</h1>
+  <p class="message">Error: ${error.message}</p>
+  <div class="solution">
+    <p><strong>SOLUTION:</strong> Check the error details and try again.</p>
+  </div>
+</body>
+</html>`
+        }
+      ],
+      // @ts-ignore
       status: 'error',
       error: error.message
-    }
+    } as any
   }
 
   // Validate sandbox configuration
