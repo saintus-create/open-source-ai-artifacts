@@ -68,53 +68,6 @@ const nextConfig = {
   
   // Webpack customizations
   webpack: (config, { dev, isServer }) => {
-    // Optimize production builds
-    if (!dev && !isServer) {
-      // Enable aggressive code splitting
-      config.optimization = {
-        ...config.optimization,
-        moduleIds: 'deterministic',
-        runtimeChunk: 'single',
-        splitChunks: {
-          chunks: 'all',
-          cacheGroups: {
-            default: false,
-            vendors: false,
-            // Vendor chunk for node_modules
-            vendor: {
-              name: 'vendor',
-              chunks: 'all',
-              test: /node_modules/,
-              priority: 20,
-            },
-            // Common chunk for shared code
-            common: {
-              name: 'common',
-              minChunks: 2,
-              chunks: 'all',
-              priority: 10,
-              reuseExistingChunk: true,
-              enforce: true,
-            },
-            // Radix UI components in separate chunk
-            radix: {
-              test: /[\\/]node_modules[\\/]@radix-ui[\\/]/,
-              name: 'radix',
-              chunks: 'all',
-              priority: 30,
-            },
-            // AI SDK in separate chunk
-            ai: {
-              test: /[\\/]node_modules[\\/](@ai-sdk|ai)[\\/]/,
-              name: 'ai',
-              chunks: 'all',
-              priority: 30,
-            },
-          },
-        },
-      };
-    }
-
     // Bundle analyzer (only when ANALYZE=true)
     if (process.env.ANALYZE === 'true') {
       const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
