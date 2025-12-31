@@ -5,12 +5,12 @@
  * Tests the complete workflow from user input through backend processing to final output rendering
  */
 
-import { securityManager } from '../lib/security.js'
-import { monitoringManager } from '../lib/monitoring.js'
-import { sandboxErrorHandler } from '../lib/sandbox-errors.js'
-import { FallbackManager } from '../lib/fallbacks.js'
-import { mcpValidator } from '../lib/mcp-validation.js'
-import { validateEnvironment } from '../lib/validation.js'
+const { securityManager } = require('../lib/security.js')
+const { monitoringManager } = require('../lib/monitoring.js')
+const { sandboxErrorHandler } = require('../lib/sandbox-errors.js')
+const { FallbackManager } = require('../lib/fallbacks.js')
+const { mcpValidator } = require('../lib/mcp-validation.js')
+const { validateEnvironment } = require('../lib/validation.js')
 
 console.log('🔍 COMPREHENSIVE END-TO-END INTEGRATION TEST')
 console.log('===========================================\n')
@@ -322,6 +322,6 @@ if (testResults.failed === 0) {
 }
 
 // Export results for further analysis
-import { writeFileSync } from 'fs'
+const { writeFileSync } = require('fs')
 writeFileSync('INTEGRATION_TEST_RESULTS.json', JSON.stringify(testResults, null, 2))
 console.log('\n📄 Results saved to INTEGRATION_TEST_RESULTS.json')
