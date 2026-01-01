@@ -185,7 +185,7 @@ export class MCPValidator {
     const expectedTools = ['read_file', 'fetch_kpi_data', 'browse_docs', 'git_tool', 'discover_mcp_services', 'validate_mcp_compliance']
     
     for (const toolName of expectedTools) {
-      if (tools[toolName]) {
+      if (tools[toolName as keyof typeof tools]) {
         checks.push({ name: `Tool: ${toolName}`, status: 'pass', details: 'Tool is properly defined' })
       } else {
         checks.push({ name: `Tool: ${toolName}`, status: 'fail', details: 'Tool is missing or not properly defined' })
@@ -235,7 +235,7 @@ export class MCPValidator {
         checks.push({ name: 'Error Rate', status: 'warn', details: `High error count: ${health.errors.count}` })
       }
     } catch (error) {
-      checks.push({ name: 'Monitoring System', status: 'fail', details: `Monitoring system error: ${error.message}` })
+      checks.push({ name: 'Monitoring System', status: 'fail', details: `Monitoring system error: ${error instanceof Error ? error.message : 'Unknown error'}` })
     }
 
     const allPassed = checks.every(check => check.status === 'pass')
@@ -281,7 +281,7 @@ export class MCPValidator {
         checks.push({ name: 'Service Health', status: 'fail', details: 'No healthy services found' })
       }
     } catch (error) {
-      checks.push({ name: 'Service Discovery', status: 'fail', details: `Service discovery failed: ${error.message}` })
+      checks.push({ name: 'Service Discovery', status: 'fail', details: `Service discovery failed: ${error instanceof Error ? error.message : 'Unknown error'}` })
     }
 
     const allPassed = checks.every(check => check.status === 'pass')
@@ -325,7 +325,7 @@ export class MCPValidator {
         operation: 'read_file',
         success: false,
         duration: 0,
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       })
     }
 
@@ -350,7 +350,7 @@ export class MCPValidator {
         operation: 'fetch_kpi_data',
         success: false,
         duration: 0,
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       })
     }
 
@@ -375,7 +375,7 @@ export class MCPValidator {
         operation: 'discover_mcp_services',
         success: false,
         duration: 0,
-        error: error.message
+        error: error instanceof Error ? error.message : 'Unknown error'
       })
     }
 

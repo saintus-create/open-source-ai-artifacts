@@ -2,6 +2,7 @@ import './globals.css'
 import { ThemeProvider } from './providers'
 import { Toaster } from '@/components/ui/toaster'
 import { ScreenReaderAnnouncer } from '@/components/screen-reader-announcer'
+import { ErrorBoundary } from '@/components/error-boundary'
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 
@@ -48,7 +49,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <ErrorBoundary>
+            {children}
+          </ErrorBoundary>
           <ScreenReaderAnnouncer />
         </ThemeProvider>
         <Toaster />

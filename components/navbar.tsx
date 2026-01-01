@@ -25,6 +25,7 @@ export function NavBar({
   canClear,
   onUndo,
   canUndo,
+  onSocialClick,
 }: {
   session: any | null
   showLogin: () => void
@@ -33,6 +34,7 @@ export function NavBar({
   canClear: boolean
   onUndo: () => void
   canUndo: boolean
+  onSocialClick?: (target: 'x' | 'github' | 'discord') => void
 }) {
   return (
     <nav className="flex bg-background py-4 w-full">

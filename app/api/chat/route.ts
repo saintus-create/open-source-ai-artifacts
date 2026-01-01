@@ -4,7 +4,7 @@ import { LLMModel, LLMModelConfig } from '@/lib/models'
 import { toGenerationPrompt } from '@/lib/prompt'
 import { fragmentSchema as schema } from '@/lib/schema'
 import { astSchema } from '@/lib/ast-schema'
-import { Templates } from '@/lib/templates'
+import templates, { Templates } from '@/lib/templates'
 import { streamObject, LanguageModel } from 'ai'
 import { jsonError, methodGuard, parseJson, withTimeout } from '@/lib/api-utils'
 import { z } from 'zod'
@@ -84,7 +84,7 @@ export async function POST(req: Request) {
     messages: any[]
     userID?: string
     teamID?: string
-    template: Templates
+    template?: Templates
     model: LLMModel
     config: LLMModelConfig
     mode?: 'text' | 'ast' | 'raw'
@@ -146,13 +146,13 @@ export async function POST(req: Request) {
 
   const requestId = genRequestId()
   const stopTimer = monitoringManager.startTimer('chat_request')
+  
+  // Track fallback attempts to prevent infinite recursion (moved outside try block for catch access)
+  const fallbackAttempts = new Set<string>()
 
   try {
     // Debug logging for model client creation
     console.log('Chat API - Creating model client for:', model?.id, 'provider:', model?.providerId)
-
-    // Track fallback attempts to prevent infinite recursion
-    const fallbackAttempts = new Set<string>()
 
     // Raw text path using provider abstraction (OpenRouter currently)
     if (mode === 'raw' && providerSel === 'openrouter') {
@@ -228,7 +228,7 @@ export async function POST(req: Request) {
     const streamPromise = streamObject({
       model: modelClient as LanguageModel,
       schema: (mode === 'ast' ? astSchema : schema) as any,
-      system: toGenerationPrompt(template),
+      system: toGenerationPrompt(template ?? templates),
       messages,
       maxRetries: 3,
       // Whitelisted params only

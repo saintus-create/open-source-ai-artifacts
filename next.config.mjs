@@ -9,9 +9,6 @@ const nextConfig = {
   // Compress responses with gzip/brotli
   compress: true,
   
-  // Standalone output for smaller deployments (reduces Docker image size by ~80%)
-  output: 'standalone',
-  
   // Image optimization
   images: {
     formats: ['image/avif', 'image/webp'],

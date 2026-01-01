@@ -5,6 +5,8 @@
     "file": "script.py",
     "instructions": "Runs code as a Jupyter notebook cell. Strong data analysis angle. Can use complex visualisation to explain results.",
     "port": null
+    "port": null,
+    "integrity": "0000000000000000000000000000000000000000000000000000000000000000"
   },
   "nextjs-developer": {
     "name": "Next.js developer",
