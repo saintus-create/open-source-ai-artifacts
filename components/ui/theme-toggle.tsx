@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import { MoonIcon, SunIcon } from 'lucide-react'
+import { Moon, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useState, useEffect, forwardRef } from 'react'
 
@@ -31,9 +31,9 @@ export const ThemeToggle = forwardRef<
       onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
     >
       {theme === 'light' ? (
-        <SunIcon className="h-4 w-4 md:h-5 md:w-5" />
+        <Sun className="w-4 md:w-5 h-4 md:h-5" />
       ) : (
-        <MoonIcon className="h-4 w-4 md:h-5 md:w-5" />
+        <Moon className="w-4 md:w-5 h-4 md:h-5" />
       )}
     </Button>
   )
