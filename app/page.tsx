@@ -44,6 +44,11 @@ export default function Home() {
         if (process.env.NEXT_PUBLIC_FIREWORKS_API_KEY) availableProviders.push('fireworks')
         if (process.env.NEXT_PUBLIC_XAI_API_KEY) availableProviders.push('xai')
         if (process.env.NEXT_PUBLIC_DEEPSEEK_API_KEY) availableProviders.push('deepseek')
+        
+        // Special handling for Emergent - uses OPENAI_API_KEY but different endpoint
+        if (process.env.NEXT_PUBLIC_OPENAI_API_KEY && process.env.NEXT_PUBLIC_OPENAI_API_KEY.startsWith('sk-emergent-')) {
+          availableProviders.push('emergent')
+        }
       }
       
       // Always include ollama (local models)
@@ -54,15 +59,16 @@ export default function Home() {
       // Smart priority order based on capability, cost, and reliability
       const providerPriority = [
         'openrouter',    // 1. Multi-provider access - best flexibility
-        'groq',         // 2. Fast inference with good models
-        'anthropic',    // 3. Excellent quality (Claude models)
-        'mistral',      // 4. Good open-source alternative
-        'togetherai',   // 5. Another multi-provider option
-        'fireworks',    // 6. Specialized models
-        'openai',       // 7. Very capable but may have higher costs
-        'xai',          // 8. Grok models
-        'deepseek',     // 9. Code-focused models
-        'ollama'        // 10. Local models (fallback)
+        'emergent',     // 2. Emergent proxy for OpenAI models
+        'groq',         // 3. Fast inference with good models
+        'anthropic',    // 4. Excellent quality (Claude models)
+        'mistral',      // 5. Good open-source alternative
+        'togetherai',   // 6. Another multi-provider option
+        'fireworks',    // 7. Specialized models
+        'openai',       // 8. Very capable but may have higher costs
+        'xai',          // 9. Grok models
+        'deepseek',     // 10. Code-focused models
+        'ollama'        // 11. Local models (fallback)
       ]
       
       // Find the best available provider
@@ -81,6 +87,7 @@ export default function Home() {
         openai: 'gpt-4o',                           // Best OpenAI model
         mistral: 'mistral-large-latest',            // Best Mistral model
         groq: 'llama-3.3-70b-versatile',           // Fast and versatile
+        emergent: 'gpt-4o-emergent',              // GPT-4o via Emergent proxy
         openrouter: 'openrouter/auto',              // Auto-select best
         togetherai: 'meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo', // Best Together model
         fireworks: 'accounts/fireworks/models/llama-v3p1-70b-instruct', // Good Fireworks model
