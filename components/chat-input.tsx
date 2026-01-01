@@ -237,7 +237,7 @@ export function ChatInput({
               maxRows={10}
               className="bg-transparent m-0 px-4 py-4 outline-none w-full font-sans text-foreground placeholder:text-muted-foreground/50 text-sm leading-relaxed resize-none"
               required={true}
-              placeholder="Ask Antigravity..."
+              placeholder="Enter your message..."
               disabled={isErrored}
               value={input}
               onChange={handleInputChange}

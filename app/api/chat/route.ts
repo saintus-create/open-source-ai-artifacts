@@ -64,7 +64,10 @@ export async function POST(req: Request) {
 
   // Parse and validate JSON body
   const parsed = await parseJson(ChatRequestSchema)(req)
-  if (!parsed.ok) return parsed.error
+  if (!parsed.ok) {
+    console.error('Chat API - Validation failed:', parsed.error)
+    return parsed.error
+  }
 
   const {
     messages,
@@ -100,6 +103,15 @@ export async function POST(req: Request) {
     hasApiKeyOverride: !!apiKeyOverride
   })
 
+  // Log available API keys for debugging
+  console.log('Chat API - Available API keys:', {
+    openRouter: !!process.env.OPENROUTER_API_KEY,
+    groq: !!process.env.GROQ_API_KEY,
+    mistral: !!process.env.MISTRAL_API_KEY,
+    openai: !!process.env.OPENAI_API_KEY,
+    togetherai: !!process.env.TOGETHER_API_KEY
+  })
+
   // Whitelist model generation parameters supported by streamObject/model
   const {
     temperature,
@@ -111,6 +123,7 @@ export async function POST(req: Request) {
   } = config
 
   // Apply rate limiting using userID/teamID if present, falling back to IP
+  console.log('Chat API - Applying rate limiting')
   {
     const key = getClientKey(req, { userID, teamID })
     const { maxRequests, windowMs } = getRateLimitConfig()
@@ -129,6 +142,7 @@ export async function POST(req: Request) {
       })
     }
   }
+  console.log('Chat API - Rate limiting passed')
 
   const requestId = genRequestId()
   const stopTimer = monitoringManager.startTimer('chat_request')
@@ -136,6 +150,9 @@ export async function POST(req: Request) {
   try {
     // Debug logging for model client creation
     console.log('Chat API - Creating model client for:', model?.id, 'provider:', model?.providerId)
+
+    // Track fallback attempts to prevent infinite recursion
+    const fallbackAttempts = new Set<string>()
 
     // Raw text path using provider abstraction (OpenRouter currently)
     if (mode === 'raw' && providerSel === 'openrouter') {
@@ -158,19 +175,28 @@ export async function POST(req: Request) {
           let heartbeatId: any
           const send = (data: string) => streamController.enqueue(encoder.encode(`data: ${data}\n\n`))
           try {
+            console.log('Chat API - Starting SSE stream with heartbeat')
             heartbeatId = setInterval(() => send('[heartbeat]'), HEARTBEAT_MS)
+            let tokenCount = 0
             for await (const token of provider.sendMessageStream(messages as any)) {
               send(token)
+              tokenCount++
+              if (tokenCount % 100 === 0) {
+                console.log(`Chat API - Processed ${tokenCount} tokens in SSE stream`)
+              }
             }
+            console.log(`Chat API - SSE stream completed with ${tokenCount} tokens total`)
             send('[done]')
             clearInterval(heartbeatId)
             streamController.close()
           } catch (e: any) {
+            console.error('Chat API - SSE stream error:', e)
             clearInterval(heartbeatId)
             streamController.error(e)
           }
         },
         cancel() {
+          console.log('Chat API - SSE stream cancelled')
           controller.abort()
         },
       })
@@ -246,6 +272,14 @@ export async function POST(req: Request) {
     if (error?.name === 'ProviderConfigError') {
       console.log('Chat API - Attempting smart fallback')
       
+      // Prevent infinite recursion by tracking fallback attempts
+      const fallbackKey = `fallback-${providerSel}-${model?.providerId}`
+      if (fallbackAttempts.has(fallbackKey)) {
+        console.error('Chat API - Infinite fallback loop detected, breaking recursion')
+        return jsonError('fallback_loop_detected', 'Infinite fallback loop detected', 500)
+      }
+      fallbackAttempts.add(fallbackKey)
+      
       // Try OpenRouter first if available (multi-provider access)
       const openRouterApiKey = process.env.OPENROUTER_API_KEY
       if (openRouterApiKey && providerSel !== 'openrouter') {
@@ -265,19 +299,28 @@ export async function POST(req: Request) {
               let heartbeatId: any
               const send = (data: string) => streamController.enqueue(encoder.encode(`data: ${data}\n\n`))
               try {
+                console.log('Chat API - Starting fallback SSE stream with heartbeat')
                 heartbeatId = setInterval(() => send('[heartbeat]'), HEARTBEAT_MS)
+                let tokenCount = 0
                 for await (const token of provider.sendMessageStream(messages as any)) {
                   send(token)
+                  tokenCount++
+                  if (tokenCount % 100 === 0) {
+                    console.log(`Chat API - Processed ${tokenCount} tokens in fallback SSE stream`)
+                  }
                 }
+                console.log(`Chat API - Fallback SSE stream completed with ${tokenCount} tokens total`)
                 send('[done]')
                 clearInterval(heartbeatId)
                 streamController.close()
               } catch (e: any) {
+                console.error('Chat API - Fallback SSE stream error:', e)
                 clearInterval(heartbeatId)
                 streamController.error(e)
               }
             },
             cancel() {
+              console.log('Chat API - Fallback SSE stream cancelled')
               controller.abort()
             },
           })
