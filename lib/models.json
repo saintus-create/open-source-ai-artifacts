@@ -447,6 +447,27 @@
       "providerId": "ollama",
       "name": "Mistral Large",
       "multiModal": false
+      },
+      {
+      "id": "gpt-4-emergent",
+      "provider": "Emergent (OpenAI-compatible)",
+      "providerId": "emergent",
+      "name": "GPT-4 (via Emergent)",
+      "multiModal": true
+    },
+    {
+      "id": "gpt-4o-emergent",
+      "provider": "Emergent (OpenAI-compatible)",
+      "providerId": "emergent",
+      "name": "GPT-4o (via Emergent)",
+      "multiModal": true
+    },
+    {
+      "id": "gpt-3.5-turbo-emergent",
+      "provider": "Emergent (OpenAI-compatible)",
+      "providerId": "emergent",
+      "name": "GPT-3.5 Turbo (via Emergent)",
+      "multiModal": false
     }
   ]
 }

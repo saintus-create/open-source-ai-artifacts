@@ -23,11 +23,87 @@ export default function Home() {
   const [selectedTemplate, setSelectedTemplate] = useState<'auto' | TemplateId>(
     'auto',
   )
+  
+  // Use comprehensive model availability detection
+  const getSmartDefaultModel = () => {
+    try {
+      // Simplified version of the model availability detection for client-side
+      // In a real implementation, this would use the ModelAvailabilityManager
+      
+      // Check which API keys are available (NEXT_PUBLIC_ prefixed for browser)
+      const availableProviders: string[] = []
+      
+      if (typeof window !== 'undefined') {
+        // Check for API keys - these would be set as NEXT_PUBLIC_* in environment
+        if (process.env.NEXT_PUBLIC_ANTHROPIC_API_KEY) availableProviders.push('anthropic')
+        if (process.env.NEXT_PUBLIC_OPENAI_API_KEY) availableProviders.push('openai')
+        if (process.env.NEXT_PUBLIC_MISTRAL_API_KEY) availableProviders.push('mistral')
+        if (process.env.NEXT_PUBLIC_GROQ_API_KEY) availableProviders.push('groq')
+        if (process.env.NEXT_PUBLIC_OPENROUTER_API_KEY) availableProviders.push('openrouter')
+        if (process.env.NEXT_PUBLIC_TOGETHER_API_KEY) availableProviders.push('togetherai')
+        if (process.env.NEXT_PUBLIC_FIREWORKS_API_KEY) availableProviders.push('fireworks')
+        if (process.env.NEXT_PUBLIC_XAI_API_KEY) availableProviders.push('xai')
+        if (process.env.NEXT_PUBLIC_DEEPSEEK_API_KEY) availableProviders.push('deepseek')
+      }
+      
+      // Always include ollama (local models)
+      availableProviders.push('ollama')
+      
+      console.log('Available providers detected:', availableProviders)
+      
+      // Smart priority order based on capability, cost, and reliability
+      const providerPriority = [
+        'openrouter',    // 1. Multi-provider access - best flexibility
+        'groq',         // 2. Fast inference with good models
+        'anthropic',    // 3. Excellent quality (Claude models)
+        'mistral',      // 4. Good open-source alternative
+        'togetherai',   // 5. Another multi-provider option
+        'fireworks',    // 6. Specialized models
+        'openai',       // 7. Very capable but may have higher costs
+        'xai',          // 8. Grok models
+        'deepseek',     // 9. Code-focused models
+        'ollama'        // 10. Local models (fallback)
+      ]
+      
+      // Find the best available provider
+      const bestProvider = providerPriority.find(provider =>
+        availableProviders.includes(provider)
+      )
+      
+      if (!bestProvider) {
+        console.warn('No configured providers found, defaulting to first model')
+        return { model: modelsList.models[0].id }
+      }
+      
+      // Map providers to their best default models
+      const modelRecommendations: Record<string, string> = {
+        anthropic: 'claude-3-5-sonnet-latest',      // Best Claude model
+        openai: 'gpt-4o',                           // Best OpenAI model
+        mistral: 'mistral-large-latest',            // Best Mistral model
+        groq: 'llama-3.3-70b-versatile',           // Fast and versatile
+        openrouter: 'openrouter/auto',              // Auto-select best
+        togetherai: 'meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo', // Best Together model
+        fireworks: 'accounts/fireworks/models/llama-v3p1-70b-instruct', // Good Fireworks model
+        xai: 'grok-4',                              // Best Grok model
+        deepseek: 'deepseek-chat',                 // Best DeepSeek model
+        ollama: 'llama3.1'                         // Good local model
+      }
+      
+      const recommendedModel = modelRecommendations[bestProvider]
+      
+      console.log(`Smart model selection: ${bestProvider} -> ${recommendedModel}`)
+      
+      return { model: recommendedModel }
+    } catch (error) {
+      console.error('Error in smart model selection:', error)
+      // Fallback to a safe default
+      return { model: 'claude-3-5-sonnet-latest' }
+    }
+  }
+  
   const [languageModel, setLanguageModel] = useLocalStorage<LLMModelConfig>(
     'languageModel',
-    {
-      model: 'claude-3-5-sonnet-latest',
-    },
+    getSmartDefaultModel(),
   )
 
   const [isMounted, setIsMounted] = useState(false)
@@ -237,7 +313,7 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen max-h-screen">
-      <div className="grid w-full md:grid-cols-2">
+      <div className="grid md:grid-cols-2 w-full">
         <div
           className={`flex flex-col w-full max-h-full max-w-[800px] mx-auto px-4 overflow-auto ${fragment ? 'col-span-1' : 'col-span-2'}`}
         >

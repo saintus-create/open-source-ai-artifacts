@@ -52,6 +52,10 @@ export function getModelClient(model: LLMModel, config: LLMModelConfig) {
       apiKey: apiKey || process.env.GROQ_API_KEY,
       baseURL: baseURL || 'https://api.groq.com/openai/v1',
     },
+    emergent: {
+      apiKey: apiKey || process.env.OPENAI_API_KEY, // Use OPENAI_API_KEY for Emergent
+      baseURL: baseURL || 'https://api.emergent.ai/v1', // Emergent's OpenAI-compatible endpoint
+    },
     togetherai: {
       apiKey: apiKey || process.env.TOGETHER_API_KEY,
       baseURL: baseURL || 'https://api.together.xyz/v1',
@@ -97,19 +101,25 @@ export function getModelClient(model: LLMModel, config: LLMModelConfig) {
     },
     xai: () => createOpenAI(resolved.xai)(modelNameString),
     deepseek: () => createOpenAI(resolved.deepseek)(modelNameString),
+    emergent: () => createOpenAI(resolved.emergent)(modelNameString),
   }
 
   const createClient = providerConfigs[providerId as keyof typeof providerConfigs]
 
   if (!createClient) {
+    console.error(`Models - Unsupported provider: ${providerId}`)
     throw new Error(`Unsupported provider: ${providerId}`)
   }
 
   // Enforce API key presence for providers that require it (not ollama)
   const requiresKey = !['ollama', 'vertex'].includes(providerId)
   const res = (resolved as any)[providerId]
+  console.log(`Models - Provider ${providerId} requires key: ${requiresKey}, has key: ${!!res?.apiKey}`)
   if (requiresKey && !res?.apiKey) {
-    throw new ProviderConfigError(providerId, `Missing API key for provider: ${providerId}`)
+    console.error(`Models - Missing API key for provider: ${providerId}`)
+    // Provide more specific error message with available providers
+    const availableProviders = Object.keys(providerConfigs).filter(p => p !== providerId)
+    throw new ProviderConfigError(providerId, `Missing API key for provider: ${providerId}. Available providers: ${availableProviders.join(', ')}`)
   }
 
   return createClient()
