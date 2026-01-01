@@ -60,13 +60,24 @@ export function middleware(request: NextRequest) {
   // Security headers
   response.headers.set('X-Content-Type-Options', 'nosniff')
   response.headers.set('X-Frame-Options', 'DENY')
-  response.headers.set('X-XSS-Protection', '1; mode=block')
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
   response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
+  // Basic CSP suitable for Next.js; adjust as needed for third-party calls
+  const csp = [
+    "default-src 'self'",
+    "base-uri 'self'",
+    "frame-ancestors 'none'",
+    "img-src 'self' data: blob:",
+    "style-src 'self' 'unsafe-inline'",
+    "script-src 'self' 'unsafe-eval'",
+    "connect-src *",
+    "font-src 'self' data:",
+    "object-src 'none'",
+    "form-action 'self'"
+  ].join('; ')
+  response.headers.set('Content-Security-Policy', csp)
 
-  // Performance headers
-  response.headers.set('X-Frame-Options', 'SAMEORIGIN')
-  response.headers.set('X-Content-Type-Options', 'nosniff')
+  return response
 
   return response
 }

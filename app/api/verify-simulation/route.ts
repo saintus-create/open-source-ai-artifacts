@@ -7,12 +7,25 @@ import templates from '@/lib/templates'
 
 export const dynamic = 'force-dynamic'
 
-export async function GET() {
+export async function GET(request: Request) {
   const report: any = {
     timestamp: new Date().toISOString(),
     checks: [],
     status: 'pass'
   }
+
+  // Lightweight rate limiting for this diagnostic endpoint
+  try {
+    const { getRateLimitConfig } = await import('@/lib/validation')
+    const { rateLimit, getClientKey } = await import('@/lib/rate-limit')
+    const { maxRequests, windowMs } = getRateLimitConfig()
+    const key = getClientKey(request)
+    const rl = rateLimit(key, Math.min(maxRequests, 10), windowMs)
+    if (!rl.allowed) {
+      const { jsonError } = await import('@/lib/api-utils')
+      return jsonError('rate_limited', 'Too many requests', 429, { retryAfterMs: rl.retryAfterMs })
+    }
+  } catch {}
 
   try {
     // 1. Prompt Generation Logic (Simulates Context Assembly)
